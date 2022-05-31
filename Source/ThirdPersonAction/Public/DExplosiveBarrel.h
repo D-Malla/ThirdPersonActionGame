@@ -4,6 +4,8 @@
 #include "GameFramework/Actor.h"
 #include "DExplosiveBarrel.generated.h"
 
+class URadialForceComponent;
+
 UCLASS()
 class THIRDPERSONACTION_API ADExplosiveBarrel : public AActor
 {
@@ -17,10 +19,11 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* MeshComp;
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	UPROPERTY(VisibleAnywhere)
+	URadialForceComponent* ForceComp;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void PostInitializeComponents() override;
+	
+	UFUNCTION()
+	void OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 };
