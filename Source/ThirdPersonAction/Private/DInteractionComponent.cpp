@@ -78,7 +78,5 @@ void UDInteractionComponent::PrimaryInteract()
 		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 32, LineColor, false, 2.f);
 	}
 
-	
 	DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.f, 0, 2.f);
-
 }

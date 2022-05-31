@@ -8,7 +8,7 @@
 #include "DItemChest.generated.h"
 
 UCLASS()
-class THIRDPERSONACTION_API ADItemChest : public AActor, public IDGameplayInterface
+class THIRDPERSONACTION_API ADItemChest : public AActor, public IDGameplayInterface // <-- Must add interface here to use.
 {
 	GENERATED_BODY()
 
@@ -16,13 +16,14 @@ public:
 	UPROPERTY(EditAnywhere)
 	float TargetPitch;
 
+	// _Implementation is not appened because of GamePlayInterface. It is because we used the "BlueprintNative" specifier for Interact(APawn* InstigatorPawn) in GamePlayInterface
 	void Interact_Implementation(APawn* InstigatorPawn); 
 
 protected:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* BaseMesh;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* LidMesh;
 
 	// Called when the game starts or when spawned
