@@ -3,6 +3,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "DInteractionComponent.h"
+#include "DrawDebugHelpers.h"
+#include "DAttributeComponent.h"
 
 // Sets default values
 ADCharacter::ADCharacter()
@@ -18,6 +20,8 @@ ADCharacter::ADCharacter()
 	CameraComp->SetupAttachment(SpringArmComp);
 
 	InteractionComp = CreateDefaultSubobject<UDInteractionComponent>(TEXT("Interaction Component"));
+
+	AttributeComp = CreateDefaultSubobject<UDAttributeComponent>(TEXT("Attribute Component"));
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
@@ -103,16 +107,19 @@ void ADCharacter::PrimaryAttack()
 
 void ADCharacter::PrimaryAttack_TimeElapsed()
 {
-	FVector HandLocation = GetMesh()->GetSocketLocation(TEXT("Muzzle_01"));
+	if (ensureAlways(ProjectileClass))
+	{
+		FVector HandLocation = GetMesh()->GetSocketLocation(TEXT("Muzzle_01"));
 
-	FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
+		FTransform SpawnTM = FTransform(GetControlRotation(), HandLocation);
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = this;
 
-	// Spawning is always done through the world. ie: GetWorld()->
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+		// Spawning is always done through the world. ie: GetWorld()->
+		GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTM, SpawnParams);
+	}
 }
 
 void ADCharacter::PrimaryInteract()

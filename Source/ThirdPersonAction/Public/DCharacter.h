@@ -8,6 +8,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class UDInteractionComponent;
 class UAnimMontage;
+class UDAttributeComponent;
 
 UCLASS()
 class THIRDPERSONACTION_API ADCharacter : public ACharacter
@@ -15,9 +16,11 @@ class THIRDPERSONACTION_API ADCharacter : public ACharacter
 	GENERATED_BODY()
 
 protected:
+	// Choose Projectile in BP_PlayerCharacter/Unreal Editor
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> ProjectileClass;
 
+	// Choose Attack Animation in BP_PlayerCharacter/Unreal Editor
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AttackAnim;
 
@@ -34,7 +37,11 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComp;
 
+	UPROPERTY(VisibleAnywhere)
 	UDInteractionComponent* InteractionComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UDAttributeComponent* AttributeComp;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -46,7 +53,6 @@ protected:
 	void PrimaryAttack_TimeElapsed();
 
 	void PrimaryInteract();
-
 
 public:	
 	// Called every frame

@@ -2,6 +2,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "DAttributeComponent.h"
 
 // Sets default values
 ADMagicProjectile::ADMagicProjectile()
@@ -13,6 +14,7 @@ ADMagicProjectile::ADMagicProjectile()
 
 	// Use collision component's methods to set properties. ie: SphereComp->SetCollisionObjectType(ECC_WorldDynamic);
 	SphereComp->SetCollisionProfileName(TEXT("Projectile"));
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ADMagicProjectile::OnActorOverlap);
 	RootComponent = SphereComp;
 
 	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Effect Component"));
@@ -38,3 +40,17 @@ void ADMagicProjectile::Tick(float DeltaTime)
 
 }
 
+void ADMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor)
+	{
+		UDAttributeComponent* AttributeComp = Cast<UDAttributeComponent>(OtherActor->GetComponentByClass(UDAttributeComponent::StaticClass()));
+
+		if (AttributeComp)
+		{
+			AttributeComp->ApplyHealthChange(-20.f);
+
+			Destroy();
+		}
+	}
+}
