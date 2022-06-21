@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "DAttributeComponent.generated.h"
 
+class UDAttributeComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnHealthChanged, AActor*, InstigatorActor, UDAttributeComponent*, OwningComp, float, NewHealth, float, Delta);
 

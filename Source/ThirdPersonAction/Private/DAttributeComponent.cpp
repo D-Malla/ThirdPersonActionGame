@@ -6,7 +6,7 @@
 // Sets default values for this component's properties
 UDAttributeComponent::UDAttributeComponent()
 {
-	Health = 100;
+	Health = 100.0f;
 }
 
 bool UDAttributeComponent::ApplyHealthChange(float Delta)
