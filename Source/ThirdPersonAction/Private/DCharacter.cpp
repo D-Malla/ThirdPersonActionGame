@@ -29,6 +29,14 @@ ADCharacter::ADCharacter()
 	AttackAnimDelay = 0.2f;
 }
 
+void ADCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	AttributeComp->OnHealthChanged.AddDynamic(this, &ADCharacter::OnHealthChanged);
+}
+
+
 // Called to bind functionality to input
 void ADCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -160,5 +168,15 @@ void ADCharacter::PrimaryInteract()
 	if (InteractionComp)
 	{
 		InteractionComp->PrimaryInteract();
+	}
+}
+
+void ADCharacter::OnHealthChanged(AActor* InstigatorActor, UDAttributeComponent* OwningComp, float NewHealth,
+	float Delta)
+{
+	if (NewHealth <= 0.0f && Delta < 0.0f)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		DisableInput(PC);
 	}
 }

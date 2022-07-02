@@ -3,6 +3,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "DAttributeComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ADMagicProjectile::ADMagicProjectile()
 {
@@ -25,6 +26,7 @@ void ADMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComponent,
 			
 			// Only explode when we hit something valid
 			Explode();
+
 		}
 	}
 }

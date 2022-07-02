@@ -6,13 +6,20 @@
 // Sets default values for this component's properties
 UDAttributeComponent::UDAttributeComponent()
 {
-	Health = 100.0f;
+	HealthMax = 100.0f;
+	Health = HealthMax;
+}
+
+bool UDAttributeComponent::IsAlive() const
+{
+	return Health > 0.0f;
 }
 
 bool UDAttributeComponent::ApplyHealthChange(float Delta)
 {
-	Health += Delta;
+	Health = FMath::Clamp(Health += Delta, 0.0f, HealthMax);
 
+	
 	OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
 
 	return true;

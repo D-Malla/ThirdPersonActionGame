@@ -2,6 +2,8 @@
 
 
 #include "DProjectileBase.h"
+
+#include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -22,6 +24,10 @@ ADProjectileBase::ADProjectileBase()
 	MoveComp->bInitialVelocityInLocalSpace = true;
 	MoveComp->ProjectileGravityScale = 0.0f;
 	MoveComp->InitialSpeed = 8000;
+
+	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
+	AudioComp->SetupAttachment(RootComponent);
+	
 }
 
 void ADProjectileBase::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -45,6 +51,11 @@ void ADProjectileBase::Explode_Implementation()
 		SetActorEnableCollision(false);
 
 		Destroy();
+		
+		if (ImpactSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), GetActorRotation());
+		}
 	}
 }
 
