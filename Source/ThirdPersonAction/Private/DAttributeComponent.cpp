@@ -15,12 +15,25 @@ bool UDAttributeComponent::IsAlive() const
 	return Health > 0.0f;
 }
 
+bool UDAttributeComponent::IsFullHealth() const
+{
+	return Health == HealthMax;
+}
+
+float UDAttributeComponent::GetHealthMax() const
+{
+	return HealthMax;
+}
+
 bool UDAttributeComponent::ApplyHealthChange(float Delta)
 {
-	Health = FMath::Clamp(Health += Delta, 0.0f, HealthMax);
-
+	float OldHealth = Health;
 	
-	OnHealthChanged.Broadcast(nullptr, this, Health, Delta);
+	Health = FMath::Clamp(Health + Delta, 0.0f, HealthMax);
 
-	return true;
+	float ActualDelta = Health - OldHealth;
+	
+	OnHealthChanged.Broadcast(nullptr, this, Health, ActualDelta);
+
+	return ActualDelta != 0;
 }

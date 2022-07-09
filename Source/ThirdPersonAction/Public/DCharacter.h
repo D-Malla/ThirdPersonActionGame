@@ -9,6 +9,7 @@ class USpringArmComponent;
 class UDInteractionComponent;
 class UAnimMontage;
 class UDAttributeComponent;
+class UParticleSystem;
 
 UCLASS()
 class THIRDPERSONACTION_API ADCharacter : public ACharacter
@@ -22,6 +23,13 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 protected:
+	// VisibleAnywhere = read-only, still useful to view in-editor and enforce a convention
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TimeToHitParams;
+
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName HandSocketName;
+	
 	// Choose Projectile in BP_PlayerCharacter/Unreal Editor
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> ProjectileClass;
@@ -34,6 +42,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AttackAnim;
+
+	/* Particle System played during attack animation */
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UParticleSystem* CastingEffect;
 
 	FTimerHandle TimerHandle_PrimaryAttack;
 	FTimerHandle TimerHandle_BlackHoleAttack;
@@ -69,6 +81,8 @@ protected:
 	void Dash();
 
 	void Dash_TimeElapsed();
+
+	void StartAttackEffects();
 
 	// Re-use spawn logic between attacks
 	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);

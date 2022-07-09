@@ -8,6 +8,9 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundCue.h"
+#include "Camera/CameraShakeBase.h"
 
 ADProjectileBase::ADProjectileBase()
 {
@@ -27,7 +30,9 @@ ADProjectileBase::ADProjectileBase()
 
 	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("Audio Component"));
 	AudioComp->SetupAttachment(RootComponent);
-	
+
+	ImpactShakeInnerRadius = 250.0f;
+	ImpactShakeOuterRadius = 2500.0f;
 }
 
 void ADProjectileBase::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -39,22 +44,18 @@ void ADProjectileBase::OnActorHit(UPrimitiveComponent* HitComponent, AActor* Oth
 // '_Implementation' from it being marked as BlueprintNativeEvent
 void ADProjectileBase::Explode_Implementation()
 {
-	// Check to make sure we aren't already being 'destroyed'
-	// Adding ensure to see if we encounter this situation at all
-	if (ensure(!IsPendingKill()))
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());\
-
-		EffectComp->DeactivateSystem();
-
-		MoveComp->StopMovementImmediately();
-		SetActorEnableCollision(false);
-
-		Destroy();
-		
-		if (ImpactSound)
+		// Check to make sure we aren't already being 'destroyed'
+		// Adding ensure to see if we encounter this situation at all
+		if (ensure(!IsPendingKill()))
 		{
-			UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), GetActorRotation());
+			UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
+
+			UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
+
+			UGameplayStatics::PlayWorldCameraShake(this, ImpactShake, GetActorLocation(), ImpactShakeInnerRadius, ImpactShakeOuterRadius);
+
+			Destroy();
 		}
 	}
 }

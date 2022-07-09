@@ -5,6 +5,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "DInteractionComponent.h"
 #include "DAttributeComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ADCharacter::ADCharacter()
@@ -27,6 +28,8 @@ ADCharacter::ADCharacter()
 	bUseControllerRotationYaw = false;
 
 	AttackAnimDelay = 0.2f;
+	TimeToHitParams = "TimeToHit";
+	HandSocketName = "Muzzle_01";
 }
 
 void ADCharacter::PostInitializeComponents()
@@ -82,7 +85,7 @@ void ADCharacter::MoveRight(float Value)
 
 void ADCharacter::PrimaryAttack()
 {
-	PlayAnimMontage(AttackAnim);
+	StartAttackEffects();
 
 	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ADCharacter::PrimaryAttack_TimeElapsed, AttackAnimDelay);
 }
@@ -94,7 +97,7 @@ void ADCharacter::PrimaryAttack_TimeElapsed()
 
 void ADCharacter::BlackHoleAttack()
 {
-	PlayAnimMontage(AttackAnim);
+	StartAttackEffects();
 
 	GetWorldTimerManager().SetTimer(TimerHandle_BlackHoleAttack, this, &ADCharacter::BlackHoleAttack_TimeElapsed, AttackAnimDelay);
 }
@@ -106,7 +109,7 @@ void ADCharacter::BlackHoleAttack_TimeElapsed()
 
 void ADCharacter::Dash()
 {
-	PlayAnimMontage(AttackAnim);
+	StartAttackEffects();
 
 	GetWorldTimerManager().SetTimer(TimerHandle_Dash, this, &ADCharacter::Dash_TimeElapsed, AttackAnimDelay);
 }
@@ -116,11 +119,19 @@ void ADCharacter::Dash_TimeElapsed()
 	SpawnProjectile(DashProjectileClass);
 }
 
+void ADCharacter::StartAttackEffects()
+{
+	PlayAnimMontage(AttackAnim);
+
+	UGameplayStatics::SpawnEmitterAttached(CastingEffect, GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
+}
+
+
 void ADCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
 {
 	if (ensureAlways(ClassToSpawn))
 	{
-		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+		FVector HandLocation = GetMesh()->GetSocketLocation(HandSocketName);
 
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -171,9 +182,13 @@ void ADCharacter::PrimaryInteract()
 	}
 }
 
-void ADCharacter::OnHealthChanged(AActor* InstigatorActor, UDAttributeComponent* OwningComp, float NewHealth,
-	float Delta)
+void ADCharacter::OnHealthChanged(AActor* InstigatorActor, UDAttributeComponent* OwningComp, float NewHealth, float Delta)
 {
+	if (Delta < 0.0f)
+	{
+		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParams, GetWorld()->TimeSeconds);
+	}
+	
 	if (NewHealth <= 0.0f && Delta < 0.0f)
 	{
 		APlayerController* PC = Cast<APlayerController>(GetController());
