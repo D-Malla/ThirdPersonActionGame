@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "DAICharacter.generated.h"
 
+class UPawnSensingComponent;
+
 UCLASS()
 class THIRDPERSONACTION_API ADAICharacter : public ACharacter
 {
@@ -16,10 +18,11 @@ public:
 	ADAICharacter();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
+	
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UPawnSensingComponent* PawnSensingComp;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UFUNCTION()
+	void OnPawnSeen(APawn* Pawn);
 };
